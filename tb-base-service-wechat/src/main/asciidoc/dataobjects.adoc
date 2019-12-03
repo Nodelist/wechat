@@ -1,0 +1,80 @@
+= Cheatsheets
+
+[[Merchant]]
+== Merchant
+
+++++
+++++
+'''
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[apiKey]]`@apiKey`|`String`|-
+|[[createTime]]`@createTime`|`String`|-
+|[[id]]`@id`|`String`|-
+|[[mchId]]`@mchId`|`String`|-
+|[[mchName]]`@mchName`|`String`|-
+|[[remarks]]`@remarks`|`String`|-
+|[[updateTime]]`@updateTime`|`String`|-
+|===
+
+[[RiskModel]]
+== RiskModel
+
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[apiUrl]]`@apiUrl`|`String`|-
+|[[createTime]]`@createTime`|`String`|-
+|[[id]]`@id`|`String`|-
+|[[modelGuid]]`@modelGuid`|`String`|-
+|[[modelName]]`@modelName`|`String`|-
+|[[remarks]]`@remarks`|`String`|-
+|[[status]]`@status`|`String`|-
+|[[updateTime]]`@updateTime`|`String`|-
+|===
+
+[[WeChat]]
+== WeChat
+
+++++
+++++
+'''
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[appId]]`@appId`|`String`|-
+|[[appName]]`@appName`|`String`|-
+|[[appSecret]]`@appSecret`|`String`|-
+|[[appType]]`@appType`|`String`|-
+|[[bindStatus]]`@bindStatus`|`Number (Integer)`|-
+|[[createTime]]`@createTime`|`String`|-
+|[[id]]`@id`|`String`|-
+|[[remarks]]`@remarks`|`String`|-
+|[[updateTime]]`@updateTime`|`String`|-
+|===
+
+[[WechatMerchant]]
+== WechatMerchant
+
+++++
+++++
+'''
+
+[cols=">25%,25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[appId]]`@appId`|`String`|-
+|[[createTime]]`@createTime`|`String`|-
+|[[id]]`@id`|`String`|-
+|[[pId]]`@pId`|`String`|-
+|[[updateTime]]`@updateTime`|`String`|-
+|===
+
