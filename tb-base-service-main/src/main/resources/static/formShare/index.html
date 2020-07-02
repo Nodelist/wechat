@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>表单分享预览</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- <link rel="stylesheet" href="../src/sdk/mwSdk.css"> -->
+    <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <style>
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .el-dialog__title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        #test {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"> </div>
+    <script src="./formdesign-sdk.js"></script>
+    <script>
+        let baseUrl = 'http://192.168.0.32:8082',
+            complexUrl = 'http://192.168.0.3:8025/ureport/preview',
+            userInfoUrl = 'http://192.168.0.4:8030/tb/wechat/getUserInfo',
+            obj = {},
+            pass = `
+            <div class='pass'>
+                <el-dialog title="请输入分享密码" :visible.sync="dialogVisible" width="30%" :close-on-click-modal="false" :close-on-press-escape="false" center>
+                    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="demo-ruleForm">
+                        <el-form-item label="" prop="password">
+                            <el-input type="password" v-model="ruleForm.password" placeholder="分享密码"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <span slot="footer" class="dialog-footer">
+                        <el-button @click="dialogVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="submit('ruleForm')">确 定</el-button>
+                    </span>
+                </el-dialog>
+            </div>
+        `;
+        getParam();
+        getForm();
+
+        //获取url参数
+        function getParam() {
+            var url = location.search; //?id=3&ab=3&cd=4
+            var arr = url.slice(1, url.length).split('&'); //["id=3", "ab=3", "cd=4"]
+            arr.forEach(function(val) {
+                //切割=两边的数据
+                var arr1 = val.split('=');
+                obj[arr1[0]] = arr1[1];
+            })
+        }
+
+        //获取表单数据
+        function getForm() {
+            // 获取用户id
+            $.ajax({
+                url: userInfoUrl + '?appid=' + obj.appid + '&code=' + obj.code,
+                method: 'get',
+                success: function(res) {
+                    if (res.success && res.data.openid) {
+                        alert("获取成功")
+                        $.ajax({
+                            url: baseUrl + '/share/form/queryById?id=' + obj.formId,
+                            method: 'get',
+                            success: function(res) {
+                                //加密表单
+                                // if (res.success == 'success' && res.data.code == '') {
+                                //     renderPass()
+                                // } else {
+                                //不加密表单
+                                if (res.success) {
+                                    $("#app").html('<div id="test"></test>')
+                                    document.title = res.result.formName
+                                    let formData = JSON.parse(res.result.formDesignJson)
+                                    let mwsdk = new MW.FormDesignSdk('#test', //元素id
+                                        {
+                                            url: baseUrl + '/share/form/addData', //录入地址
+                                            formData: formData, //表单数据
+                                            configUrl: baseUrl, //接口基地址
+                                            complexUrl: complexUrl, //复杂表单基地址
+                                            callback: function(val) {} //修改或新增的回调函数
+                                        });
+                                } else {
+                                    var dom = new Vue({
+                                        el: '#app',
+                                        data: {},
+                                        mounted() {
+                                            this.$message({
+                                                type: 'error',
+                                                message: res.msg
+                                            });
+                                        },
+                                    })
+                                }
+                            }
+                        })
+                        window.history.pushState(null, '', '?formId=' + obj.formId + '&userId=' + res.data.openid);
+                    } else {
+                        alert('请求用户信息失败')
+                    }
+                }
+            })
+        }
+
+        //加密表单
+        function renderPass(val) {
+            $('#app').html(pass)
+            var dom = new Vue({
+                el: '#app',
+                data: {
+                    ruleForm: {
+                        password: ''
+                    },
+                    rules: {
+                        password: [{
+                            required: true,
+                            message: '请输入分享密码',
+                            trigger: 'blur'
+                        }, ],
+                    },
+                    dialogVisible: true
+                },
+                methods: {
+                    // 添加
+                    submit: function(formName) {
+                        this.$refs[formName].validate((valid) => {
+                            if (valid) {
+                                //获取加密表单数据
+                                $("#app").html('<div id="test"></test>')
+                                $.ajax({
+                                    url: baseUrl + '/share/form/' + obj.uuid + '?code=' + this.ruleForm.password,
+                                    method: 'get',
+                                    success: function(res) {
+                                        if (res.data.result !== 'success') {
+                                            renderPass(res)
+                                        } else {
+                                            dom.dialogVisible = false
+                                            document.title = res.data.name
+                                            let mwsdk = new MW.FormDesignSdk('#test', //表单id
+                                                {
+                                                    url: baseUrl + '/platform/forms/' + res.data.id + '?uid=' + obj.uid,
+                                                    formData: res.data,
+                                                    configUrl: baseUrl,
+                                                    complexUrl: complexUrl,
+                                                    callback: function(val) {} //修改或新增的回调函数
+                                                });
+                                        }
+                                    }
+                                })
+                            } else {
+                                return false;
+                            }
+                        });
+                    },
+                },
+                mounted() {
+                    if (val) {
+                        this.$message({
+                            type: 'error',
+                            message: val.data.message
+                        });
+                    }
+                },
+            })
+        }
+    </script>
+</body>
+
+</html>

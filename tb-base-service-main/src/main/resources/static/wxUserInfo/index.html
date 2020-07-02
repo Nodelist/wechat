@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>微信获取用户信息</title>
+    <!-- <script src="http://libs.baidu.com/jquery/2.0.0/jquery.js"></script> -->
+</head>
+
+<body>
+    <div id="test">
+        获取用户信息
+    </div>
+</body>
+
+<script type="text/javascript">
+    window.onload = function() {
+        var obj = {}
+        debugger
+
+        getParam();
+        //获取参数
+        function getParam() {
+            var url = location.search;
+            var arr = url.slice(1, url.length).split('&'); // id, appid, code
+            arr.forEach(function(val) {
+                //切割=两边的数据
+                var arr1 = val.split('=');
+                obj[arr1[0]] = arr1[1];
+            })
+        }
+
+        // 封装 ajax 请求
+        function ajaxRequest(url, method, getData) {
+            var xhr = new XMLHttpRequest()
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        var msg = xhr.responseText
+                        var result = JSON.parse(msg)
+                        getData(result)
+                        return result
+                    } else {
+                        alert('响应失败！')
+                    }
+                }
+            }
+            xhr.open(method, url, true)
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send(null)
+        }
+
+        var openId_text = document.getElementById("test");
+
+        // var oppenid_url = "http://192.168.0.36:8022/tb/wechat/getUserInfo?appid=" + obj.appid + "&code=" + obj.code; // 获取openid接口
+        var oppenid_url = "http://47.92.3.224:8030/tb/wechat/getUserInfo?appid=" + obj.appid + "&code=" + obj.code; // 获取openid接口
+
+        ajaxRequest(oppenid_url, 'GET', function(res) {
+            debugger
+            if (res.data != null) {
+                openid = res.data.openid
+                let userInfo = JSON.stringify(res.data)
+                alert(userInfo)
+                openId_text.innerHTML = userInfo
+                    // if (openid != null && openid != "undefined") {
+                    //     // window.open('http://192.168.0.36:8091/base/formView/add/' + obj.formId + '?userId=' + openid, '_self')
+                    //     console.log(res.data)
+                    // } else {}
+            } else {
+                alert("获取失败，请联系工作人员检查")
+            }
+        })
+    }
+
+    // var obj = {}, // 存放当前URL参数
+    //         num = 101
+    //     jsonInfo = {},
+    //         modelGuid = "07FD3098-B250-4392-AAAC-994DC0A1F9A2",
+    //         reqId = 1001,
+    //         openid = "ogSk-uPgFUmb6rALV5H3k76hzi6c";
+    //     let queryTime = new Date().getTime();
+
+    //         $.ajax({
+    //     url: "http://192.168.0.36:9099/services/v1/uploadInfo",
+    //     data: {
+    //         "modelGuid": "07FD3098-B250-4392-AAAC-994DC0A1F9A2",
+    //         "reqId": reqId.toString(),
+    //         "jsonInfo": {
+    //             "queryId": (num++).toString(),
+    //             "openId": "ogSk-uPgFUmb6rALV5H3k76hzi6c",
+    //             "queryTime": queryTime
+    //         }
+    //     },
+    //     type: "POST",
+
+    //     success: function(res) {
+    //         console.log(res)
+    //     },
+    //     error: err => console.log(err)
+    // });
+    // var radar_url = "http://192.168.0.36:9099/services/v1/uploadInfo";
+    // let queryTime = new Date().getTime();
+    // jsonInfo.queryId = (num++).toString();
+    // jsonInfo.openId = openid;
+    // jsonInfo.queryTime = queryTime;
+
+    // var param = {
+    //     modelGuid: "07FD3098-B250-4392-AAAC-994DC0A1F9A2",
+    //     reqId: reqId.toString(),
+    //     jsonInfo: {
+    //         "queryId": (num++).toString(),
+    //         "openId": "ogSk-uPgFUmb6rALV5H3k76hzi6c",
+    //         "queryTime": queryTime
+    //     }
+    // var param = 'modelGuid=' + modelGuid + '&reqId=' + reqId.toString() + '&jsonInfo=' + jsonInfo.toString();
+    // console.log(param)
+    // 'modelGuid=' + modelGuid + '&reqId=' + reqId + '&jsonInfo=' + jsonInfo;
+    // ajaxRequest(radar_url, 'POST', param, function(res) {
+    //         alert(res)
+    //     })
+    //     }
+    // })
+</script>
+
+</html>
